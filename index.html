@@ -36,6 +36,32 @@
     .hr { height: 1px; background: #eceff3; margin: 6px 0 2px; }
     footer { margin: 18px 0 8px; color: #6b7280; font-size: .85rem; text-align: center; }
     .badge { display: inline-block; padding: 4px 8px; background: #eef2ff; color: #334155; border-radius: 999px; font-size: .8rem; }
+
+    /* === 모바일(≤480px)에서 폼 압축: 결과가 버튼 바로 아래 보이도록 === */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .card { padding: 12px; }
+      .tabs { gap: 6px; margin: 8px 0; }
+      .tab { padding: 8px 10px; border-radius: 10px; }
+
+      /* 핵심: 가로/세로는 2열, 세 번째 입력(중량/평량/몬메)은 한 줄 전체 */
+      .card .grid.grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .card .grid.grid-2 > div:nth-child(3) {
+        grid-column: 1 / -1;
+      }
+
+      label { margin-bottom: 4px; font-size: .88rem; }
+      .row { gap: 8px; }
+      input, select { padding: 10px; font-size: 16px; } /* 모바일 자동줌 방지 */
+      .btn { padding: 10px 12px; font-size: 1rem; }
+      .out { padding: 12px; border-radius: 12px; font-size: .95rem; }
+      .muted { margin: 4px 0; font-size: .85rem; }
+      .hr { margin: 6px 0; }
+    }
   </style>
 </head>
 <body>
@@ -163,7 +189,7 @@
         <button id="btnMonme" class="btn">평량 계산</button>
         <button id="btnReset3" class="btn ghost" type="button">초기화</button>
       </div>
-      <p class="muted">단위: 1 몬메(もんめ; 돈) = 3.75 g 
+      <p class="muted">단위: 1 몬메(もんめ; 돈) = 3.75 g</p>
       <p class="muted">단위: 1 m² = 10,000 cm²</p>
       <p class="muted">본 계산기는 항상 <b>1장 기준</b>으로 결과를 표시합니다.</p>
       <div class="hr"></div>
@@ -208,6 +234,7 @@
       const A = w*h; // m²
       const gsm = m / A; // g/m²
       $('out1').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,1)} g`;
+      if (window.innerWidth < 500) $('out1').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
     }
 
     // 계산 2: 평량 -> 중량
@@ -220,6 +247,7 @@
       const A = w*h; // m²
       const mass = gsm * A; // g (1장 기준)
       $('out2').innerHTML = `✅ 중량: <b>${fmt(mass,1)} g</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 평량: ${fmt(gsm,1)} g/m²`;
+      if (window.innerWidth < 500) $('out2').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
     }
 
     // 계산 3: 몬메 -> 평량
@@ -233,6 +261,7 @@
       const A = w*h; // m²
       const gsm = m / A; // g/m²
       $('out3').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,2)} g<br>• 몬메: ${fmt(monme,2)} 돈`;
+      if (window.innerWidth < 500) $('out3').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
     }
 
     // 버튼 바인딩
@@ -264,6 +293,3 @@
   </script>
 </body>
 </html>
-
-
-
