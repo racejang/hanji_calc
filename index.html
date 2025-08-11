@@ -1,55 +1,3 @@
-<div class="tabs" role="tablist" aria-label="계산 모드">
-  <div id="tab-w2gsm" class="tab active" role="tab" aria-controls="panel-w2gsm" aria-selected="true">
-    중량(g) → 평<span class="mobile-break"><br></span>량(g/m²)
-  </div>
-  <div id="tab-gsm2w" class="tab" role="tab" aria-controls="panel-gsm2w" aria-selected="false">
-    평량(g/m²) →<span class="mobile-break"><br></span>중량(g)
-  </div>
-  <div id="tab-monme2gsm" class="tab" role="tab" aria-controls="panel-monme2gsm" aria-selected="false">
-    몬메(돈) → 평<span class="mobile-break"><br></span>량(g/m²)
-  </div>
-</div>
-CSS 추가
-css
-복사
-편집
-/* 기본(데스크톱)에서는 줄바꿈 숨김 */
-.mobile-break { display: none; }
-
-/* 모바일(480px 이하)에서만 줄바꿈 표시 */
-@media (max-width: 480px) {
-  .mobile-break { display: inline; }
-}
-💡 적용 방법
-
-HTML에서 기존 .tabs 안의 <div> 3개를 위 코드로 교체.
-
-CSS 맨 아래에 .mobile-break 스타일 추가.
-
-이렇게 하면 PC에선 한 줄, 모바일에선 보기 좋은 위치에서 자동으로 2줄로 바뀜.
-
-원하면 내가 네 전체 HTML 파일에 이 변경을 반영한 완성본도 만들어줄 수 있음.
-그걸로 바로 덮어쓰면 돼.
-바로 만들어줄까?
-
-
-
-
-
-
-
-
-나의 말:
-응
-
-
-ChatGPT의 말:
-좋아, 그러면 네 HTML 전체 코드에 모바일 전용 줄바꿈 기능을 적용해서 완성본으로 줄게.
-PC/태블릿에서는 한 줄, 모바일(480px 이하)에서는 지정한 위치에서 줄이 바뀌도록 만들었어.
-
-html
-복사
-편집
 <!doctype html>
 <html lang="ko">
 <head>
@@ -69,10 +17,10 @@ html
     .tab { padding: 10px 12px; text-align: center; border-radius: 12px; border: 1px solid #d9e0ee; cursor: pointer; background: #fff; }
     .tab.active { border-color: #2d6cdf; background: #eef2ff; font-weight: 700; }
 
-    /* 모바일 전용 줄바꿈 제어 */
-    .mobile-break { display: none; }
+    /* 모바일 전용 줄바꿈: PC는 한 줄, 모바일은 '→' 뒤에서 줄바꿈 */
+    .mobile-break { display: inline; } /* 기본(PC/태블릿): 한 줄 */
     @media (max-width: 480px) {
-      .mobile-break { display: inline; }
+      .mobile-break { display: block; } /* 모바일: 줄바꿈 */
     }
 
     .card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
@@ -106,12 +54,10 @@ html
         grid-template-columns: 1fr 1fr;
         gap: 10px;
       }
-      .card .grid.grid-2 > div:nth-child(3) {
-        grid-column: 1 / -1;
-      }
+      .card .grid.grid-2 > div:nth-child(3) { grid-column: 1 / -1; }
       label { margin-bottom: 4px; font-size: .88rem; }
       .row { gap: 8px; }
-      input, select { padding: 10px; font-size: 16px; }
+      input, select { padding: 10px; font-size: 16px; } /* 모바일 자동줌 방지 */
       .btn { padding: 10px 12px; font-size: 1rem; }
       .out { padding: 12px; border-radius: 12px; font-size: .95rem; }
       .muted { margin: 4px 0; font-size: .85rem; }
@@ -129,13 +75,13 @@ html
 
     <div class="tabs" role="tablist" aria-label="계산 모드">
       <div id="tab-w2gsm" class="tab active" role="tab" aria-controls="panel-w2gsm" aria-selected="true">
-        중량(g) <span class="mobile-break"><br></span>→ 평량(g/m²)
+        중량(g) →<span class="mobile-break"> 평량(g/m²)</span>
       </div>
       <div id="tab-gsm2w" class="tab" role="tab" aria-controls="panel-gsm2w" aria-selected="false">
-        평량(g/m²) <span class="mobile-break"><br></span>→중량(g)
+        평량(g/m²) →<span class="mobile-break"> 중량(g)</span>
       </div>
       <div id="tab-monme2gsm" class="tab" role="tab" aria-controls="panel-monme2gsm" aria-selected="false">
-        몬메(돈) <span class="mobile-break"><br></span>→ 평량(g/m²)
+        몬메(돈) →<span class="mobile-break"> 평량(g/m²)</span>
       </div>
     </div>
 
@@ -295,7 +241,7 @@ html
       const A = w*h; // m²
       const gsm = m / A; // g/m²
       $('out1').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,1)} g`;
-      if (window.innerWidth < 500) $('out1').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
+      if (window.innerWidth < 500) $('out1').scrollIntoView({block:'start', behavior:'smooth'});
     }
 
     // 계산 2: 평량 -> 중량
@@ -308,7 +254,7 @@ html
       const A = w*h; // m²
       const mass = gsm * A; // g (1장 기준)
       $('out2').innerHTML = `✅ 중량: <b>${fmt(mass,1)} g</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 평량: ${fmt(gsm,1)} g/m²`;
-      if (window.innerWidth < 500) $('out2').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
+      if (window.innerWidth < 500) $('out2').scrollIntoView({block:'start', behavior:'smooth'});
     }
 
     // 계산 3: 몬메 -> 평량
@@ -322,7 +268,7 @@ html
       const A = w*h; // m²
       const gsm = m / A; // g/m²
       $('out3').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,2)} g<br>• 몬메: ${fmt(monme,2)} 돈`;
-      if (window.innerWidth < 500) $('out3').scrollIntoView({block:'start', behavior:'smooth'}); // 모바일 보정
+      if (window.innerWidth < 500) $('out3').scrollIntoView({block:'start', behavior:'smooth'});
     }
 
     // 버튼 바인딩
@@ -354,8 +300,3 @@ html
   </script>
 </body>
 </html>
-
-
-
-
-
