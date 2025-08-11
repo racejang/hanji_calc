@@ -5,275 +5,115 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>한지 계산기 (중량 ↔ 평량 ↔ 몬메)</title>
   <style>
-    :root { --gap: 14px; --radius: 16px; }
-    * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif; margin: 0; padding: 16px; background: #f6f7f9; color: #111; line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; }
-    header { margin-bottom: 14px; }
-    h1 { font-size: 1.35rem; margin: 0 0 6px; }
-    p.sub { margin: 0; color: #555; font-size: .95rem; }
+    /* ===== 기본 리셋/레이아웃(간단) ===== */
+    :root{ color-scheme: dark; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; font-family:system-ui, -apple-system, Segoe UI, Roboto, Apple SD Gothic Neo, Noto Sans KR, Arial, sans-serif;
+      background:#0f1115; color:#e6e9ef;
+    }
+    .container{ max-width:920px; margin:0 auto; padding:24px 16px 80px; }
+    h1{ margin:8px 0 4px; font-size:28px; }
+    .sub{ color:#a7acb4; margin-bottom:16px; }
 
-    .tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; }
-    .tab { padding: 10px 12px; text-align: center; border-radius: 12px; border: 1px solid #d9e0ee; cursor: pointer; background: #fff; }
-    .tab.active { border-color: #2d6cdf; background: #eef2ff; font-weight: 700; }
-
-    /* PC/태블릿: 1줄 고정 */
-    .mobile-break { display: none; }
-    .tabs .tab { white-space: nowrap; }
-
-    /* 모바일: 2줄 고정 */
-    @media (max-width: 480px) {
-      .mobile-break { display: inline; }
-      .tabs .tab { white-space: normal; line-height: 1.2; }
+    /* ===== 탭 영역 ===== */
+    .tabs{
+      display:flex; gap:12px; margin:16px 0 20px;
+    }
+    .tabs button{
+      flex:1; padding:16px 12px; border-radius:14px; border:1px solid #2a2e36; background:#171a21;
+      color:#e6e9ef; font-weight:700; font-size:16px;
+      white-space: nowrap;       /* ← 모든 기기에서 기본 1줄 유지 */
+      word-break: keep-all;      /* ← 한국어 중간 줄바꿈 방지 */
+      cursor:pointer;
+    }
+    .tabs button.active{
+      outline:0; border-color:#2441ff; background:#0d47ff1a; box-shadow:0 0 0 3px #2441ff22 inset;
     }
 
-    .card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-    .grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
-    @media (min-width: 720px){ .grid-2 { grid-template-columns: 1fr 1fr; } }
-
-    label { display: block; font-size: .9rem; color: #333; margin-bottom: 6px; }
-    input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e5ea; font-size: 1rem; background: #fff; }
-    input[type="number"] { appearance: textfield; }
-    input:focus, select:focus { outline: none; border-color: #7aa7ff; box-shadow: 0 0 0 3px rgba(122,167,255,.2); }
-
-    .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
-    .btn { padding: 12px 14px; border-radius: 12px; border: 0; background: #2d6cdf; color: #fff; font-weight: 600; cursor: pointer; }
-    .btn.ghost { background: transparent; color: #2d6cdf; border: 1px solid #cfe0ff; }
-
-    .out { background: #0b1220; color: #e7f0ff; border-radius: var(--radius); padding: 14px; font-variant-numeric: tabular-nums; }
-    .out b { font-size: 1.2rem; }
-    .muted { color: #6b7280; font-size: .9rem; }
-    .hr { height: 1px; background: #eceff3; margin: 6px 0 2px; }
-    footer { margin: 18px 0 8px; color: #6b7280; font-size: .85rem; text-align: center; }
-    .badge { display: inline-block; padding: 4px 8px; background: #eef2ff; color: #334155; border-radius: 999px; font-size: .8rem; }
-
-    /* 모바일(≤480px) 폼 압축 */
-    @media (max-width: 480px) {
-      body { padding: 12px; }
-      .card { padding: 12px; }
-      .tabs { gap: 6px; margin: 8px 0; }
-      .tab { padding: 8px 10px; border-radius: 10px; }
-      .card .grid.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-      .card .grid.grid-2 > div:nth-child(3) { grid-column: 1 / -1; }
-      label { margin-bottom: 4px; font-size: .88rem; }
-      .row { gap: 8px; }
-      input, select { padding: 10px; font-size: 16px; }
-      .btn { padding: 10px 12px; font-size: 1rem; }
-      .out { padding: 12px; border-radius: 12px; font-size: .95rem; }
-      .muted { margin: 4px 0; font-size: .85rem; }
-      .hr { margin: 6px 0; }
+    /* ===== 모바일 전용: 가운데 탭만 2줄 처리 ===== */
+    .mobile-break{ display:none; }
+    @media (max-width:480px){
+      .mobile-break{ display:inline; }      /* 가운데 탭에만 들어있음 */
+      .tabs button{ font-size:14px; }       /* 너무 좁은 기기 대비(선택) */
     }
+
+    /* ===== 아래는 데모용 카드/폼 스타일(기존과 크게 다치지 않게 최소화) ===== */
+    .card{ background:#13161c; border:1px solid #2a2e36; border-radius:18px; padding:20px; }
+    .row{ display:flex; gap:12px; flex-wrap:wrap; margin:8px 0 10px; }
+    .col{ flex:1 1 220px; }
+    label{ display:block; margin-bottom:8px; color:#b8bec7; }
+    input, select{
+      width:100%; padding:14px 12px; border-radius:12px; border:1px solid #2a2e36; background:#0f1217; color:#e6e9ef;
+      font-size:16px;
+    }
+    .btn{
+      display:block; width:100%; padding:16px; margin-top:12px; border:0; border-radius:14px; background:#1859ff; color:white; font-weight:800; font-size:16px; cursor:pointer;
+    }
+    .ghost{ background:#0f1217; border:1px solid #2a2e36; color:#e6e9ef; }
+    .hint{ color:#9aa1ab; margin-top:12px; }
+    .note{ margin-top:14px; padding:14px; border-radius:12px; background:#0f1217; border:1px solid #2a2e36; color:#e6e9ef; }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="badge">한지 · 종이 계산</div>
-      <h1>한지 계산기 (중량 ↔ 평량 ↔ 몬메)</h1>
-      <p class="sub">세 탭으로 분리, mm·cm만 지원, 항상 <b>1장 기준</b> 계산.</p>
-    </header>
+  <div class="container">
+    <div class="sub">한지 · 종이 계산</div>
+    <h1>한지 계산기 (중량 ↔ 평량 ↔ 몬메)</h1>
+    <div class="sub">세 탭으로 분리, mm·cm만 지원, 항상 <b>1장 기준</b> 계산.</div>
 
-    <div class="tabs" role="tablist" aria-label="계산 모드">
-      <div id="tab-w2gsm" class="tab active" role="tab" aria-controls="panel-w2gsm" aria-selected="true">
-        중량(g) → 평량(g/m²)
+    <!-- ===== 탭: 가운데만 모바일에서 2줄 ===== -->
+    <div class="tabs" role="tablist" aria-label="계산 종류">
+      <button class="active" role="tab" aria-selected="true">중량(g) → 평량(g/m²)</button>
+      <button role="tab" aria-selected="false">평량(g/m²)<span class="mobile-break"><br></span>→ 중량(g)</button>
+      <button role="tab" aria-selected="false">몬메(돈) → 평량(g/m²)</button>
+    </div>
+
+    <!-- ===== 카드(예: 중량 → 평량) ===== -->
+    <div class="card">
+      <h2 style="margin:0 0 12px;">중량(g) → 평량(g/m²)</h2>
+      <div class="row">
+        <div class="col">
+          <label>가로 길이</label>
+          <div class="row">
+            <div class="col"><input placeholder="예: 93" inputmode="decimal"></div>
+            <div class="col">
+              <select>
+                <option>cm</option>
+                <option>mm</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <label>세로 길이</label>
+          <div class="row">
+            <div class="col"><input placeholder="예: 63" inputmode="decimal"></div>
+            <div class="col">
+              <select>
+                <option>cm</option>
+                <option>mm</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>
-      <div id="tab-gsm2w" class="tab" role="tab" aria-controls="panel-gsm2w" aria-selected="false">
-        평량(g/m²) <span class="mobile-break"><br></span>→ 중량(g)
+      <div class="row">
+        <div class="col">
+          <label>중량 (g)</label>
+          <input placeholder="예: 18.0 (1장 중량)" inputmode="decimal">
+        </div>
       </div>
-      <div id="tab-monme2gsm" class="tab" role="tab" aria-controls="panel-monme2gsm" aria-selected="false">
-        몬메(돈) → 평량(g/m²)
+      <button class="btn">평량 계산</button>
+      <button class="btn ghost">초기화</button>
+      <div class="hint">단위: 1 m² = 10,000 cm²</div>
+      <div class="sub" style="margin-top:6px;">본 계산기는 항상 <b>1장 기준</b>으로 결과를 표시합니다.</div>
+      <div class="note">대기 중… 값을 입력하고 계산하세요.</div>
+      <div class="hint" style="margin-top:16px;">
+        계산식: ① 평량(g/m²) = 중량(g) / 면적(m²) · ② 중량(g) = 평량(g/m²) × 면적(m²)
       </div>
     </div>
 
-    <!-- 탭 1: 중량 -> 평량 -->
-    <section id="panel-w2gsm" class="card" role="tabpanel" aria-labelledby="tab-w2gsm">
-      <h2 style="margin:0 0 8px">중량(g) → 평량(g/m²)</h2>
-      <div class="grid grid-2">
-        <div>
-          <label for="w1">가로 길이</label>
-          <div class="row">
-            <input id="w1" type="number" inputmode="decimal" placeholder="예: 93" step="any" />
-            <select id="uw1"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="h1">세로 길이</label>
-          <div class="row">
-            <input id="h1" type="number" inputmode="decimal" placeholder="예: 63" step="any" />
-            <select id="uh1"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="m1">중량 (g)</label>
-          <input id="m1" type="number" inputmode="decimal" placeholder="예: 18.0 (1장 중량)" step="any" />
-        </div>
-      </div>
-      <div class="grid" style="margin-top: var(--gap)">
-        <button id="btnGsm" class="btn">평량 계산</button>
-        <button id="btnReset1" class="btn ghost" type="button">초기화</button>
-      </div>
-      <p class="muted">단위: 1 m² = 10,000 cm²</p>
-      <p class="muted">본 계산기는 항상 <b>1장 기준</b>으로 결과를 표시합니다.</p>
-      <div class="hr"></div>
-      <div id="out1" class="out">대기 중… 값을 입력하고 계산하세요.</div>
-    </section>
-
-    <!-- 탭 2: 평량 -> 중량 -->
-    <section id="panel-gsm2w" class="card" role="tabpanel" aria-labelledby="tab-gsm2w" style="display:none">
-      <h2 style="margin:0 0 8px">평량(g/m²) → 중량(g)</h2>
-      <div class="grid grid-2">
-        <div>
-          <label for="w2">가로 길이</label>
-          <div class="row">
-            <input id="w2" type="number" inputmode="decimal" placeholder="예: 93" step="any" />
-            <select id="uw2"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="h2">세로 길이</label>
-          <div class="row">
-            <input id="h2" type="number" inputmode="decimal" placeholder="예: 63" step="any" />
-            <select id="uh2"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="gsm2">평량 (g/m²)</label>
-          <input id="gsm2" type="number" inputmode="decimal" placeholder="예: 30.0 (1장 평량)" step="any" />
-        </div>
-      </div>
-      <div class="grid" style="margin-top: var(--gap)">
-        <button id="btnMass" class="btn">중량 계산</button>
-        <button id="btnReset2" class="btn ghost" type="button">초기화</button>
-      </div>
-      <p class="muted">단위: 1 m² = 10,000 cm²</p>
-      <p class="muted">본 계산기는 항상 <b>1장 기준</b>으로 결과를 표시합니다.</p>
-      <div class="hr"></div>
-      <div id="out2" class="out">대기 중… 값을 입력하고 계산하세요.</div>
-    </section>
-
-    <!-- 탭 3: 몬메 -> 평량 -->
-    <section id="panel-monme2gsm" class="card" role="tabpanel" aria-labelledby="tab-monme2gsm" style="display:none">
-      <h2 style="margin:0 0 8px">몬메(돈) → 평량(g/m²)</h2>
-      <div class="grid grid-2">
-        <div>
-          <label for="w3">가로 길이</label>
-          <div class="row">
-            <input id="w3" type="number" inputmode="decimal" placeholder="예: 93" step="any" />
-            <select id="uw3"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="h3">세로 길이</label>
-          <div class="row">
-            <input id="h3" type="number" inputmode="decimal" placeholder="예: 63" step="any" />
-            <select id="uh3"><option value="mm">mm</option><option value="cm" selected>cm</option></select>
-          </div>
-        </div>
-        <div>
-          <label for="monme">몬메 (돈)</label>
-          <input id="monme" type="number" inputmode="decimal" placeholder="예: 5.0 (1장 몬메)" step="any" />
-        </div>
-      </div>
-      <div class="grid" style="margin-top: var(--gap)">
-        <button id="btnMonme" class="btn">평량 계산</button>
-        <button id="btnReset3" class="btn ghost" type="button">초기화</button>
-      </div>
-      <p class="muted">단위: 1 몬메(もんめ; 돈) = 3.75 g</p>
-      <p class="muted">단위: 1 m² = 10,000 cm²</p>
-      <p class="muted">본 계산기는 항상 <b>1장 기준</b>으로 결과를 표시합니다.</p>
-      <div class="hr"></div>
-      <div id="out3" class="out">대기 중… 값을 입력하고 계산하세요.</div>
-    </section>
-
-    <footer>
-      계산식: ① <code>평량(g/m²) = 중량(g) / 면적(m²)</code> ② <code>중량(g) = 평량(g/m²) × 면적(m²)</code>
-    </footer>
+    <!-- 실제 다른 탭의 카드/스크립트는 기존 코드 유지해서 이어 붙이면 됩니다 -->
   </div>
-
-  <script>
-    const $ = (id) => document.getElementById(id);
-    const fmt = (v, d=1) => (isFinite(v) ? Number(v).toFixed(d) : "-");
-    function toMeters(value, unit){
-      const v = Number(value);
-      if (!isFinite(v) || v <= 0) return NaN;
-      return unit === 'mm' ? v/1000 : unit === 'cm' ? v/100 : NaN;
-    }
-
-    function switchTab(which){
-      const ids = ['w2gsm','gsm2w','monme2gsm'];
-      ids.forEach(id=>{
-        $('tab-'+id).classList.toggle('active', id===which);
-        $('tab-'+id).setAttribute('aria-selected', id===which ? 'true' : 'false');
-        $('panel-'+id).style.display = (id===which) ? 'block' : 'none';
-      });
-    }
-    $('tab-w2gsm').addEventListener('click', () => switchTab('w2gsm'));
-    $('tab-gsm2w').addEventListener('click', () => switchTab('gsm2w'));
-    $('tab-monme2gsm').addEventListener('click', () => switchTab('monme2gsm'));
-
-    function calcGSM(){
-      const w = toMeters($('w1').value, $('uw1').value);
-      const h = toMeters($('h1').value, $('uh1').value);
-      const m = Number($('m1').value);
-      if(!isFinite(w) || !isFinite(h) || w<=0 || h<=0) { $('out1').innerHTML = '크기(가로/세로)와 단위를 올바르게 입력하세요.'; return; }
-      if(!isFinite(m) || m<=0){ $('out1').innerHTML = '중량(g)을 입력하세요.'; return; }
-      const A = w*h;
-      const gsm = m / A;
-      $('out1').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,1)} g`;
-      if (window.innerWidth < 500) $('out1').scrollIntoView({block:'start', behavior:'smooth'});
-    }
-
-    function calcMass(){
-      const w = toMeters($('w2').value, $('uw2').value);
-      const h = toMeters($('h2').value, $('uh2').value);
-      const gsm = Number($('gsm2').value);
-      if(!isFinite(w) || !isFinite(h) || w<=0 || h<=0) { $('out2').innerHTML = '크기(가로/세로)와 단위를 올바르게 입력하세요.'; return; }
-      if(!isFinite(gsm) || gsm<=0){ $('out2').innerHTML = '평량(g/m²)을 입력하세요.'; return; }
-      const A = w*h;
-      const mass = gsm * A;
-      $('out2').innerHTML = `✅ 중량: <b>${fmt(mass,1)} g</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 평량: ${fmt(gsm,1)} g/m²`;
-      if (window.innerWidth < 500) $('out2').scrollIntoView({block:'start', behavior:'smooth'});
-    }
-
-    function calcMonme(){
-      const w = toMeters($('w3').value, $('uw3').value);
-      const h = toMeters($('h3').value, $('uh3').value);
-      const monme = Number($('monme').value);
-      if(!isFinite(w) || !isFinite(h) || w<=0 || h<=0) { $('out3').innerHTML = '크기(가로/세로)와 단위를 올바르게 입력하세요.'; return; }
-      if(!isFinite(monme) || monme<=0){ $('out3').innerHTML = '몬메(돈) 값을 입력하세요.'; return; }
-      const m = monme * 3.75;
-      const A = w*h;
-      const gsm = m / A;
-      $('out3').innerHTML = `✅ 평량: <b>${fmt(gsm,1)} g/m²</b><br>• 면적: ${fmt(A,5)} m² (1장)<br>• 중량: ${fmt(m,2)} g<br>• 몬메: ${fmt(monme,2)} 돈`;
-      if (window.innerWidth < 500) $('out3').scrollIntoView({block:'start', behavior:'smooth'});
-    }
-
-    $('btnGsm').addEventListener('click', calcGSM);
-    $('btnMass').addEventListener('click', calcMass);
-    $('btnMonme').addEventListener('click', calcMonme);
-
-    $('btnReset1').addEventListener('click', () => {
-      ['w1','h1','m1'].forEach(id => $(id).value='');
-      $('out1').innerHTML='대기 중… 값을 입력하고 계산하세요.';
-    });
-    $('btnReset2').addEventListener('click', () => {
-      ['w2','h2','gsm2'].forEach(id => $(id).value='');
-      $('out2').innerHTML='대기 중… 값을 입력하고 계산하세요.';
-    });
-    $('btnReset3').addEventListener('click', () => {
-      ['w3','h3','monme'].forEach(id => $(id).value='');
-      $('out3').innerHTML='대기 중… 값을 입력하고 계산하세요.';
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if(e.key !== 'Enter') return;
-      if($('panel-w2gsm').style.display !== 'none') calcGSM();
-      else if($('panel-gsm2w').style.display !== 'none') calcMass();
-      else calcMonme();
-    });
-  </script>
 </body>
 </html>
-
-
-
