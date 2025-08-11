@@ -17,9 +17,15 @@
     .tab { padding: 10px 12px; text-align: center; border-radius: 12px; border: 1px solid #d9e0ee; cursor: pointer; background: #fff; }
     .tab.active { border-color: #2d6cdf; background: #eef2ff; font-weight: 700; }
 
-    /* 모바일 전용 줄바꿈: PC는 한 줄, 모바일은 '→' 뒤에서 줄바꿈 */
-    .mobile-break { display: inline; }
-    @media (max-width: 480px) { .mobile-break { display: block; } }
+    /* PC/태블릿: 1줄 고정 */
+    .mobile-break { display: none; }
+    .tabs .tab { white-space: nowrap; }
+
+    /* 모바일: 2줄 고정 */
+    @media (max-width: 480px) {
+      .mobile-break { display: inline; }
+      .tabs .tab { white-space: normal; line-height: 1.2; }
+    }
 
     .card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
     .grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
@@ -69,13 +75,13 @@
 
     <div class="tabs" role="tablist" aria-label="계산 모드">
       <div id="tab-w2gsm" class="tab active" role="tab" aria-controls="panel-w2gsm" aria-selected="true">
-        중량(g) →<span class="mobile-break"> 평량(g/m²)</span>
+        중량(g) <span class="mobile-break"><br></span>→ 평량(g/m²)
       </div>
       <div id="tab-gsm2w" class="tab" role="tab" aria-controls="panel-gsm2w" aria-selected="false">
-        평량(g/m²) →<span class="mobile-break"> 중량(g)</span>
+        평량(g/m²) <span class="mobile-break"><br></span>→ 중량(g)
       </div>
       <div id="tab-monme2gsm" class="tab" role="tab" aria-controls="panel-monme2gsm" aria-selected="false">
-        몬메(돈) →<span class="mobile-break"> 평량(g/m²)</span>
+        몬메(돈) <span class="mobile-break"><br></span>→ 평량(g/m²)
       </div>
     </div>
 
@@ -268,3 +274,4 @@
   </script>
 </body>
 </html>
+
