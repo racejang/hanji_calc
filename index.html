@@ -4,14 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>한지 계산기 (중량 ↔ 평량 ↔ 몬메)</title>
-<style>
+  <style>
     :root { --gap: 14px; --radius: 16px; }
     * { box-sizing: border-box; }
-    body {
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
-      margin: 0; padding: 16px;
-      background: #f6f7f9; color: #111; line-height: 1.5;
-    }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif; margin: 0; padding: 16px; background: #f6f7f9; color: #111; line-height: 1.5; }
     .wrap { max-width: 720px; margin: 0 auto; }
     header { margin-bottom: 14px; }
     h1 { font-size: 1.35rem; margin: 0 0 6px; }
@@ -25,42 +21,20 @@
     .mobile-break { display: inline; }
     @media (max-width: 480px) { .mobile-break { display: block; } }
 
-    .card {
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.06);
-    }
+    .card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
     .grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
     @media (min-width: 720px){ .grid-2 { grid-template-columns: 1fr 1fr; } }
 
     label { display: block; font-size: .9rem; color: #333; margin-bottom: 6px; }
-    input, select {
-      width: 100%; padding: 12px;
-      border-radius: 12px; border: 1px solid #e2e5ea;
-      font-size: 1rem; background: #fff;
-    }
+    input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e5ea; font-size: 1rem; background: #fff; }
     input[type="number"] { appearance: textfield; }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #7aa7ff;
-      box-shadow: 0 0 0 3px rgba(122,167,255,.2);
-    }
+    input:focus, select:focus { outline: none; border-color: #7aa7ff; box-shadow: 0 0 0 3px rgba(122,167,255,.2); }
 
     .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
-    .btn {
-      padding: 12px 14px;
-      border-radius: 12px; border: 0;
-      background: #2d6cdf; color: #fff;
-      font-weight: 600; cursor: pointer;
-    }
+    .btn { padding: 12px 14px; border-radius: 12px; border: 0; background: #2d6cdf; color: #fff; font-weight: 600; cursor: pointer; }
     .btn.ghost { background: transparent; color: #2d6cdf; border: 1px solid #cfe0ff; }
 
-    .out {
-      background: #0b1220; color: #e7f0ff;
-      border-radius: var(--radius); padding: 14px;
-      font-variant-numeric: tabular-nums;
-    }
+    .out { background: #0b1220; color: #e7f0ff; border-radius: var(--radius); padding: 14px; font-variant-numeric: tabular-nums; }
     .out b { font-size: 1.2rem; }
     .muted { color: #6b7280; font-size: .9rem; }
     .hr { height: 1px; background: #eceff3; margin: 6px 0 2px; }
@@ -82,19 +56,6 @@
       .out { padding: 12px; border-radius: 12px; font-size: .95rem; }
       .muted { margin: 4px 0; font-size: .85rem; }
       .hr { margin: 6px 0; }
-    }
-
-    /* ✅ 추가: 카드 안 표가 배경보다 튀어나오지 않게 */
-    .card table {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      overflow-x: auto;   /* 넘치면 가로 스크롤 */
-      border-collapse: collapse;
-    }
-    .card table td,
-    .card table th {
-      white-space: nowrap;  /* 줄바꿈 방지 (원하면 normal로 바꾸세요) */
     }
   </style>
 </head>
