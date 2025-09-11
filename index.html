@@ -7,30 +7,55 @@
   <style>
     :root { --gap: 14px; --radius: 16px; }
     * { box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif; margin: 0; padding: 16px; background: #f6f7f9; color: #111; line-height: 1.5; }
-    .wrap { max-width: 720px; margin: 0 auto; }
+
+    /* ===== 레이아웃 기본 ===== */
+    body {
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+      margin: 0; padding: 16px;
+      background: #f6f7f9; color: #111; line-height: 1.5;
+    }
+    .wrap { width: 100%; max-width: 720px; margin: 0 auto; min-width: 0; }
     header { margin-bottom: 14px; }
     h1 { font-size: 1.35rem; margin: 0 0 6px; }
     p.sub { margin: 0; color: #555; font-size: .95rem; }
 
-    .tabs { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0; }
-    .tab { padding: 10px 12px; text-align: center; border-radius: 12px; border: 1px solid #d9e0ee; cursor: pointer; background: #fff; }
+    .tabs {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin: 12px 0;
+      overflow-x: auto;  /* 좁은 화면에서 넘침 보호 */
+    }
+    .tab { padding: 10px 12px; text-align: center; border-radius: 12px; border: 1px solid #d9e0ee; cursor: pointer; background: #fff; white-space: nowrap; }
     .tab.active { border-color: #2d6cdf; background: #eef2ff; font-weight: 700; }
 
     /* 모바일 전용 줄바꿈: PC는 한 줄, 모바일은 '→' 뒤에서 줄바꿈 */
     .mobile-break { display: inline; }
     @media (max-width: 480px) { .mobile-break { display: block; } }
 
-    .card { background: #fff; border-radius: var(--radius); padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-    .grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); }
+    .card {
+      background: #fff; border-radius: var(--radius); padding: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      max-width: 100%;  /* 부모보다 커지지 않도록 */
+      overflow: hidden; /* 최후방어 */
+      min-width: 0;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: var(--gap); min-width: 0; }
     @media (min-width: 720px){ .grid-2 { grid-template-columns: 1fr 1fr; } }
 
     label { display: block; font-size: .9rem; color: #333; margin-bottom: 6px; }
-    input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e5ea; font-size: 1rem; background: #fff; }
+    input, select {
+      width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #e2e5ea;
+      font-size: 1rem; background: #fff; min-width: 0;
+    }
     input[type="number"] { appearance: textfield; }
     input:focus, select:focus { outline: none; border-color: #7aa7ff; box-shadow: 0 0 0 3px rgba(122,167,255,.2); }
 
-    .row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: end; }
+    /* === 여기 핵심: 입력행이 부모보다 안 튀어나오게 === */
+    .row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto; /* 좌측 입력이 실제로 줄어들 수 있게 */
+      gap: 10px; align-items: end; min-width: 0;
+    }
+
     .btn { padding: 12px 14px; border-radius: 12px; border: 0; background: #2d6cdf; color: #fff; font-weight: 600; cursor: pointer; }
     .btn.ghost { background: transparent; color: #2d6cdf; border: 1px solid #cfe0ff; }
 
@@ -41,13 +66,16 @@
     footer { margin: 18px 0 8px; color: #6b7280; font-size: .85rem; text-align: center; }
     .badge { display: inline-block; padding: 4px 8px; background: #eef2ff; color: #334155; border-radius: 999px; font-size: .8rem; }
 
+    /* 이미지/테이블 안전장치 */
+    img, table { max-width: 100%; height: auto; }
+
     /* 모바일(≤480px) 폼 압축 */
     @media (max-width: 480px) {
       body { padding: 12px; }
       .card { padding: 12px; }
       .tabs { gap: 6px; margin: 8px 0; }
       .tab { padding: 8px 10px; border-radius: 10px; }
-      .card .grid.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .card .grid.grid-2 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
       .card .grid.grid-2 > div:nth-child(3) { grid-column: 1 / -1; }
       label { margin-bottom: 4px; font-size: .88rem; }
       .row { gap: 8px; }
@@ -268,7 +296,3 @@
   </script>
 </body>
 </html>
-
-
-
-
